@@ -6,6 +6,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.action_chains import ActionChains
 
 options = Options()
 options.add_argument('--ignore-certificate-errors')
@@ -18,40 +19,31 @@ navegador.get('https://192.168.224.197/Cobranca/index.aspx')
 
 wait = WebDriverWait(navegador, 10)
 
-# Campo usuário (matrícula)
-usuario = wait.until(
-    EC.presence_of_element_located((By.ID, "txtUsuarioLogin"))
-)
+# Login
+usuario = wait.until(EC.presence_of_element_located((By.ID, "txtUsuarioLogin")))
 usuario.clear()
 usuario.send_keys("4059468")
 
-# Campo senha
 senha = navegador.find_element(By.ID, "txtSenhaLogin")
 senha.clear()
 senha.send_keys("134679")
 
-# Botão OK
 botao = navegador.find_element(By.ID, "btnOkLogin")
 botao.click()
 
-# Aguarda o menu "Consulta"
-consulta = WebDriverWait(navegador, 10).until(
-    EC.element_to_be_clickable((By.ID, "tdMenu1_SolpartMenu103"))
-)
+# Menu "Consulta"
+consulta = wait.until(EC.presence_of_element_located((By.ID, "tdMenu1_SolpartMenu103")))
 
-consulta.click()
+# Hover (importante nesses menus antigos)
+ActionChains(navegador).move_to_element(consulta).perform()
 
-# Aguarda o submenu aparecer e clica
-submenu = WebDriverWait(navegador, 10).until(
-    EC.element_to_be_clickable((By.ID, "iconMenu1_SolpartMenu10306"))
-)
-submenu.click()
+# Clique forçado
+navegador.execute_script("arguments[0].click();", consulta)
 
-# Aguarda o radio aparecer e clica
-excel = WebDriverWait(navegador, 10).until(
-    EC.element_to_be_clickable((By.ID, "rbExcel"))
-)
+# Submenu
+submenu = wait.until(EC.presence_of_element_located((By.ID, "iconMenu1_SolpartMenu10306")))
+navegador.execute_script("arguments[0].click();", submenu)
 
-excel.click()
 
-input()
+
+input("Finalizado. Pressione Enter para sair...")
