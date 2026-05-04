@@ -5,7 +5,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from datetime import datetime
 import time
-
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -78,20 +77,20 @@ for _ in range(7):
     time.sleep(0.4)    
 
 # Data de hoje
-
-
 data_hoje = datetime.now().strftime("%d/%m/%Y")
 
-# Digita no campo
-campo_data = navegador.switch_to.active_element
-campo_data.clear()
-campo_data.send_keys(data_hoje)
+# Campo início
+campo_inicio = WebDriverWait(navegador, 10).until(
+    EC.presence_of_element_located((By.ID, "txtDtInicio"))
+)
 
-navegador.switch_to.active_element.send_keys(Keys.TAB)
-time.sleep(0.2)
-campo_data = navegador.switch_to.active_element
-campo_data.clear()
-campo_data.send_keys(data_hoje)
+# Preenche corretamente + dispara evento da máscara
+navegador.execute_script("""
+    arguments[0].focus();
+    arguments[0].value = arguments[1];
+    arguments[0].dispatchEvent(new Event('change'));
+    arguments[0].blur();
+""", campo_inicio, data_hoje)
 
 
 input()
