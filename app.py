@@ -1,16 +1,19 @@
+import time
+import pyautogui
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 from datetime import datetime
-import time
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
-from websocket import send
 
+
+
+    
 options = Options()
 options.add_argument('--ignore-certificate-errors')
 options.add_argument('--allow-insecure-localhost')
@@ -51,14 +54,15 @@ navegador.execute_script("arguments[0].click();", submenu)
 body = navegador.find_element(By.TAG_NAME, "body")
 body.click()
 
-# Dá 8 TABs
+# Dá 2 TABs
 for _ in range(2):
     navegador.switch_to.active_element.send_keys(Keys.TAB)
     time.sleep(0.2)  # pequeno delay ajuda estabilidade
 
-# Seta para direita
+# Seta para direita para marcar "Excel"
 navegador.switch_to.active_element.send_keys(Keys.ARROW_RIGHT)
 
+# Dá mais 5 TABs para chegar no campo do relatório
 for _ in range(5):
     navegador.switch_to.active_element.send_keys(Keys.TAB)
     time.sleep(0.2)  # pequeno delay ajuda estabilidade
@@ -66,31 +70,28 @@ for _ in range(5):
 # Digita o código 194 no campo focado
 navegador.switch_to.active_element.send_keys("194")
 
+# Dá mais 6 TABs para chegar no checkbox "Períodos"
 for _ in range(6):
     navegador.switch_to.active_element.send_keys(Keys.TAB)
-    time.sleep(0.2)  # pequeno delay ajuda estabilidade
-        
-navegador.switch_to.active_element.send_keys(Keys.SPACE)
+    time.sleep(0.2) 
     
+navegador.switch_to.active_element.send_keys(Keys.SPACE)
+
+# Dá mais 7 TABs para chegar no campo de datas
 for _ in range(7):
     navegador.switch_to.active_element.send_keys(Keys.TAB)
-    time.sleep(0.4)    
+    time.sleep(0.2)    
 
-# Data de hoje
-data_hoje = datetime.now().strftime("%d/%m/%Y")
-
-# Campo início
-campo_inicio = WebDriverWait(navegador, 10).until(
-    EC.presence_of_element_located((By.ID, "txtDtInicio"))
+# espera o campo existir após o postback
+campo = WebDriverWait(navegador, 20).until(
+    EC.presence_of_element_located((By.XPATH, "//*[@id='txtDtInicio']"))
 )
 
-# Preenche corretamente + dispara evento da máscara
-navegador.execute_script("""
-    arguments[0].focus();
-    arguments[0].value = arguments[1];
-    arguments[0].dispatchEvent(new Event('change'));
-    arguments[0].blur();
-""", campo_inicio, data_hoje)
-
+campo.click()
+# pequena pausa
+time.sleep(1)
+data = datetime.now().strftime("%d%m%Y")
+# digita REAL no teclado
+pyautogui.write(data, interval=0.15)
 
 input()
