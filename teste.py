@@ -1,7 +1,11 @@
 import pyautogui
 import time
+from datetime import datetime
 
-print("Você tem 5 segundos...")
 time.sleep(5)
 
-pyautogui.write("Teste PyAutoGUI funcionando", interval=0.1)
+data = datetime.now().strftime("%d/%m/%Y")
+
+for n in range(1):
+    pyautogui.write(data, interval=0.15)
+    

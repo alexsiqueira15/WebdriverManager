@@ -1,5 +1,4 @@
 import time
-import pyautogui
 from selenium import webdriver
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium.webdriver.chrome.service import Service
@@ -10,18 +9,18 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
-
-
-
-    
+  
 options = Options()
 options.add_argument('--ignore-certificate-errors')
 options.add_argument('--allow-insecure-localhost')
+options.add_experimental_option("detach", True)
 
 service = Service(ChromeDriverManager().install())
 navegador = webdriver.Chrome(service=service, options=options)
 
 navegador.get('https://192.168.224.197/Cobranca/index.aspx')
+
+# navegador.maximize_window() -- mantem a janela do navegador no tamanho padrão para evitar problemas de elementos fora da tela
 
 wait = WebDriverWait(navegador, 10)
 
@@ -77,21 +76,55 @@ for _ in range(6):
     
 navegador.switch_to.active_element.send_keys(Keys.SPACE)
 
-# Dá mais 7 TABs para chegar no campo de datas
-for _ in range(7):
-    navegador.switch_to.active_element.send_keys(Keys.TAB)
-    time.sleep(0.2)    
 
-# espera o campo existir após o postback
-campo = WebDriverWait(navegador, 20).until(
-    EC.presence_of_element_located((By.XPATH, "//*[@id='txtDtInicio']"))
+# 1️⃣ Marca o checkbox (isso dispara POSTBACK)
+navegador.switch_to.active_element.send_keys(Keys.SPACE)
+
+# 2️⃣ Aguarda o postback terminar e o campo aparecer
+
+iframes = navegador.find_elements(By.TAG_NAME, "iframe")
+
+for i, frame in enumerate(iframes):
+    navegador.switch_to.frame(frame)
+    if navegador.find_elements(By.ID, "txtDtInicio"):
+        print("Iframe correto:", i)
+        break
+    navegador.switch_to.default_content()
+
+
+data_inicio = datetime.now().strftime("%d/%m/%Y")
+data_fim = datetime.now().strftime("%d/%m/%Y")
+
+
+navegador.execute_script("""
+    function setDate(id, value) {
+        const input = document.getElementById(id);
+        if (!input) return;
+
+        input.focus();
+        input.click();
+        input.value = '';
+        input.value = value;
+
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+        input.dispatchEvent(new Event('blur', { bubbles: true }));
+    }
+
+    setDate('txtDtInicio', arguments[0]);
+    setDate('txtDtFim', arguments[1]);
+""", data_inicio, data_fim)
+
+botao_consultar = WebDriverWait(navegador, 30).until(
+    EC.element_to_be_clickable((By.ID, "btnConsultar"))
 )
 
-campo.click()
-# pequena pausa
-time.sleep(1)
-data = datetime.now().strftime("%d%m%Y")
-# digita REAL no teclado
-pyautogui.write(data, interval=0.15)
 
-input()
+navegador.execute_script("""
+    document.getElementById('btnConsultar').click();
+""")
+
+
+WebDriverWait(navegador, 60).until(
+    EC.presence_of_element_located((By.ID, "gridResultado"))
+)
