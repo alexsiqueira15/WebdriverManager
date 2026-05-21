@@ -31,16 +31,17 @@ class Sistema:
         self.executando = False
 
         self.caminho_driver = tk.StringVar(
-            value="C:/Users/ADM - SICOL/Desktop/msedgedriver.exe"
+            value="C:\\Users\\ADM - SICOL\\Pagow Aju\\Serverdados - Documentos\\Sicol\\Alex Santos\\webdriver\\msedgedriver.exe"
         )
 
         self.pasta_download = tk.StringVar(
             value=os.path.join(os.path.expanduser("~"), "Downloads")
         )
 
-        self.usuario = tk.StringVar(value="4067967")
+        self.usuario = tk.StringVar(value="4059468")
         self.senha = tk.StringVar()
 
+        
         self.horario_execucao = tk.StringVar(value="10:20")
 
         # ==========================================================
@@ -438,11 +439,11 @@ class Sistema:
                 )
             )
 
-            Select(select_relatorio).select_by_value("167")
+            Select(select_relatorio).select_by_value("194")
 
             time.sleep(3)
 
-            self.log("Relatório 167 selecionado.")
+            self.log("Relatório 194 selecionado.")
 
             # EXCEL
 
@@ -474,20 +475,8 @@ class Sistema:
                 pass
 
             # DATAS
-
-            hoje = datetime.now()
-
-            primeiro_dia = hoje.replace(day=1)
-
-            ultimo_dia_numero = calendar.monthrange(
-                hoje.year,
-                hoje.month
-            )[1]
-
-            ultimo_dia = hoje.replace(day=ultimo_dia_numero)
-
-            data_inicio = primeiro_dia.strftime("%d/%m/%Y")
-            data_fim = ultimo_dia.strftime("%d/%m/%Y")
+            data_inicio = datetime.now().strftime("%d/%m/%Y")
+            data_fim = datetime.now().strftime("%d/%m/%Y")
 
             campo_inicio = wait.until(
                 EC.presence_of_element_located(
