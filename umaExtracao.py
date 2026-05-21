@@ -35,7 +35,7 @@ class Sistema:
         )
 
         self.pasta_download = tk.StringVar(
-            value=os.path.join(os.path.expanduser("~"), "Downloads")
+            value=os.path.join(os.path.expanduser("~"), "C:\\Users\\ADM - SICOL\\Pagow Aju\\Serverdados - Documentos\\Sicol\\Alex Santos\\webdriver\\downloads")
         )
 
         self.usuario = tk.StringVar(value="4059468")
