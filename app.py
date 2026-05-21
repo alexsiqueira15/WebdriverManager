@@ -23,7 +23,7 @@ options.add_argument('--ignore-certificate-errors')
 options.add_argument('--allow-insecure-localhost')
 
 # Mantém o navegador aberto após o script finalizar (útil para depuração)
-# options.add_experimental_option("detach", True)
+options.add_experimental_option("detach", True)
 
 prefs = {
     "download.default_directory": DOWNLOAD_DIR,
@@ -72,8 +72,8 @@ navegador.execute_script("arguments[0].click();", submenu)
 body = navegador.find_element(By.TAG_NAME, "body")
 body.click()
 
-# Dá 2 TABs
-for _ in range(2):
+# Dá 2 TABs para chegar no primeiro dropdown "Tipo de Relatório"
+for _ in range(1):
     navegador.switch_to.active_element.send_keys(Keys.TAB)
     time.sleep(0.2)  # pequeno delay ajuda estabilidade
 
