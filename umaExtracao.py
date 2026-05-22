@@ -39,10 +39,10 @@ class Sistema:
         )
 
         self.usuario = tk.StringVar(value="4059468")
-        self.senha = tk.StringVar()
+        self.senha = tk.StringVar(value="134679")
 
         
-        self.horario_execucao = tk.StringVar(value="10:20")
+        self.intervalo_execucao = tk.IntVar(value=10)
 
         # ==========================================================
         # DRIVER
@@ -50,9 +50,25 @@ class Sistema:
 
         tk.Label(
             root,
+            text="Intervalo (minutos):",
+            font=("Arial", 10)
+        ).pack(pady=(15, 5))
+        
+        self.entry_intervalo = tk.Entry(
+            root,
+            textvariable=self.intervalo_execucao,
+            width=10,
+            justify="center"
+        )
+        self.entry_intervalo.pack()
+
+        tk.Label(
+            root,
             text="Caminho do msedgedriver.exe:",
             font=("Arial", 10)
         ).pack(pady=(15, 5))
+        
+
 
         frame_driver = tk.Frame(root)
         frame_driver.pack()
@@ -143,21 +159,7 @@ class Sistema:
         # HORÁRIO
         # ==========================================================
 
-        tk.Label(
-            root,
-            text="Horário da execução diária (HH:MM):",
-            font=("Arial", 10)
-        ).pack(pady=(15, 5))
 
-        self.entry_horario = tk.Entry(
-            root,
-            textvariable=self.horario_execucao,
-            width=15,
-            justify="center",
-            font=("Arial", 11, "bold")
-        )
-
-        self.entry_horario.pack()
 
         # ==========================================================
         # BOTÃO
@@ -212,7 +214,6 @@ class Sistema:
         self.entry_pasta.config(state="disabled")
         self.entry_usuario.config(state="disabled")
         self.entry_senha.config(state="disabled")
-        self.entry_horario.config(state="disabled")
 
         self.btn_driver.config(state="disabled")
         self.btn_pasta.config(state="disabled")
@@ -284,27 +285,12 @@ class Sistema:
 
             return
 
-        horario = self.horario_execucao.get()
-
-        try:
-
-            datetime.strptime(horario, "%H:%M")
-
-        except:
-
-            messagebox.showerror(
-                "Erro",
-                "Horário inválido! Use HH:MM"
-            )
-
-            return
-
         self.executando = True
 
         self.bloquear_campos()
 
         self.log(
-            f"Sistema iniciado. Execução diária às {horario}"
+            f"Sistema iniciado. Execução diária a cada {self.intervalo_execucao.get()} minutos."
         )
 
         threading.Thread(
@@ -317,6 +303,28 @@ class Sistema:
     # ==========================================================
 
     def loop_agendamento(self):
+        
+        while self.executando:
+            
+            self.log("Executando extração...")
+            
+            try:
+
+                self.executar_fluxo()
+
+                self.log("Extração finalizada com sucesso.")
+                
+            except Exception as e:
+
+                self.log(f"Erro: {str(e)}")
+            
+            intervalo = self.intervalo_execucao.get() * 60
+            
+            self.log(f"Aguardando {self.intervalo_execucao.get()} minutos...")
+            
+            time.sleep(intervalo)
+
+    '''def loop_agendamento(self):
 
         ultima_execucao = None
 
@@ -347,7 +355,7 @@ class Sistema:
 
                         self.log(f"Erro: {str(e)}")
 
-            time.sleep(20)
+            time.sleep(20)'''
 
     # ==========================================================
     # EXECUTAR FLUXO
